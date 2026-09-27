@@ -1,0 +1,12 @@
+{
+  "name": "porchi-master",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Porchi IELTS master platform",
+  "scripts": {
+    "start": "node server/server.js",
+    "admin": "node server/create-admin.js",
+    "test": "node --test server/tests/*.test.js"
+  },
+  "engines": { "node": ">=18" }
+}
