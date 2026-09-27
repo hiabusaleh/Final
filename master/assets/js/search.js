@@ -1,5 +1,6 @@
 /* Client-side search over modules, question types, posts, videos (Blueprint §27). Replace with server search later. */
-(function () {
+(async function () {
+  await window.PorchiAPI.contentReady;
   const D = window.PORCHI_DATA, P = window.PORCHI_POSTS, { esc, root } = window.Porchi;
   const idx = [
     ...D.modules.map(m => ({ kind: "Course", title: m.name, text: m.desc + " " + m.features.join(" "), href: `learn/${m.id}/index.html` })),

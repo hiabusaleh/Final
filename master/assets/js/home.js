@@ -1,5 +1,6 @@
 /* Home page renderers */
-(function () {
+(async function () {
+  await window.PorchiAPI.contentReady;
   const D = window.PORCHI_DATA, T = window.PORCHI_TESTS, P = window.PORCHI_POSTS || { posts: [], videos: [] };
   const { esc, moduleLink } = window.Porchi;
 

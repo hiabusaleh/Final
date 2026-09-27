@@ -14,21 +14,7 @@
 <main>
   <section class="page-hero"><div class="container">
     <div class="eyebrow">Admin / CMS</div><h1>Admin</h1>
-    <div class="notice warn">এটি শুধু কাঠামো। আসল Admin-এর জন্য backend, secure login ও role-based access লাগবে (Blueprint §23, §24, §43)।
-      ততদিন content <code>data/</code> ফোল্ডারের ফাইলে সম্পাদনা করুন।</div>
-    <div class="grid" style="margin-top:20px">
-      <div class="card"><h3>Posts</h3><p><code>data/posts.js</code> → posts</p></div>
-      <div class="card"><h3>Videos</h3><p><code>data/posts.js</code> → videos</p></div>
-      <div class="card"><h3>Module links</h3><p><code>assets/js/config.js</code></p></div>
-      <div class="card"><h3>Taxonomy &amp; modules</h3><p><code>data/content.js</code></p></div>
-      <div class="card"><h3>Test profiles &amp; flags</h3><p><code>data/test-profiles.js</code></p></div>
-      <div class="card"><h3>Users · Question Bank · Mock Tests · Analytics</h3><p>Backend প্রয়োজন</p><span class="tag soon">Future</span></div>
-    </div>
-    <h2 style="margin-top:40px">Roles (planned)</h2>
-    <table><tr><th>Role</th><th>Access</th></tr>
-      <tr><td>Super Admin</td><td>Everything</td></tr><tr><td>Content Editor</td><td>Posts, videos, lessons, resources</td></tr>
-      <tr><td>Question Editor</td><td>Questions, mock tests</td></tr><tr><td>Teacher / Assessor</td><td>Writing/Speaking evaluation</td></tr>
-      <tr><td>Student</td><td>Learning and test-taking only</td></tr></table>
+    <div id="admin"></div>
   </div></section>
 </main>
 <script src="../assets/js/config.js"></script>
@@ -37,5 +23,6 @@
 <script src="../data/posts.js"></script>
 <script src="../assets/js/site.js"></script>
 <script src="../assets/js/api.js"></script>
+<script src="../assets/js/admin.js"></script>
 </body>
 </html>

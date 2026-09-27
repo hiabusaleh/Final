@@ -1,10 +1,12 @@
 /* YouTube library: URL → video ID → lazy embed (Blueprint §18). Add videos in data/posts.js */
-(function () {
+(async function () {
+  await window.PorchiAPI.contentReady;
   const { videos } = window.PORCHI_POSTS, { esc, root } = window.Porchi;
   const ytId = url => {
     const m = String(url || "").match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
     return m ? m[1] : null;
   };
+  const link = u => esc(/^https?:/.test(u) ? u : root + u);
   const skill = new URLSearchParams(location.search).get("skill");
   const list = videos.filter(v => !skill || v.skill.toLowerCase() === skill);
   const el = document.getElementById("video-list");
@@ -17,8 +19,8 @@
       : `<div class="notice">YouTube URL যুক্ত হয়নি (data/posts.js)।</div>`;
     return `<div class="card" id="${v.id}">${media}<div style="margin-top:12px"><span class="tag">${esc(v.skill)}</span><span class="tag">${esc(v.topic)}</span></div>
       <h3>${esc(v.title)}</h3><p>${esc(v.description)}</p>
-      <div class="btn-row"><a class="btn btn-outline" href="${root}${v.relatedPractice}">Practice →</a>
-      <a class="btn btn-outline" href="${root}${v.relatedCourse}">Course →</a></div></div>`;
+      <div class="btn-row">${v.relatedPractice ? `<a class="btn btn-outline" href="${link(v.relatedPractice)}">Practice →</a>` : ""}
+      ${v.relatedCourse ? `<a class="btn btn-outline" href="${link(v.relatedCourse)}">Course →</a>` : ""}</div></div>`;
   }).join("") || `<p class="muted">এই skill-এর ভিডিও শীঘ্রই আসছে।</p>`;
   el.addEventListener("click", e => {
     const b = e.target.closest(".yt"); if (!b) return;

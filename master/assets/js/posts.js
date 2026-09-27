@@ -1,5 +1,6 @@
 /* Admin-published posts with category filter + social share (Blueprint §17) */
-(function () {
+(async function () {
+  await window.PorchiAPI.contentReady;
   const { posts } = window.PORCHI_POSTS, { esc } = window.Porchi;
   const cats = ["All", ...new Set(posts.map(p => p.category))];
   let active = "All";

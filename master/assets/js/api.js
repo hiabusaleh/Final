@@ -30,3 +30,14 @@
       `<a href="${root}account/index.html" title="Account">👤 ${esc(u.name.split(" ")[0])}</a>`;
   });
 })();
+
+/* Posts/videos: when the server has published items, they replace the static data/posts.js entries */
+window.PorchiAPI.contentReady = (async () => {
+  const A = window.PorchiAPI, P = window.PORCHI_POSTS = window.PORCHI_POSTS || { posts: [], videos: [] };
+  if (!A.online) return;
+  try {
+    const [{ posts }, { videos }] = await Promise.all([A.get("/posts"), A.get("/videos")]);
+    if (posts.length) P.posts = posts.map(p => ({ ...p, date: (p.publishAt || p.createdAt).slice(0, 10), excerpt: p.excerpt || p.body.slice(0, 140) }));
+    if (videos.length) P.videos = videos;
+  } catch { /* keep static data */ }
+})();
