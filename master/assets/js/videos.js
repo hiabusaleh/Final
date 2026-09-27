@@ -24,6 +24,7 @@
   }).join("") || `<p class="muted">এই skill-এর ভিডিও শীঘ্রই আসছে।</p>`;
   el.addEventListener("click", e => {
     const b = e.target.closest(".yt"); if (!b) return;
+    window.PorchiAPI.track("video_play", b.closest(".card")?.id || b.dataset.id);
     b.outerHTML = `<iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/${b.dataset.id}?autoplay=1"
       allow="autoplay; encrypted-media" allowfullscreen title="YouTube video"></iframe>`;
   });

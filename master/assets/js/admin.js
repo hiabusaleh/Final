@@ -24,6 +24,7 @@
     const tabs = Object.entries(R).filter(([, r]) => PERMS[r.perm].includes(u.role)).map(([k, r]) => [k, r.label]);
     if (PERMS.users.includes(u.role)) tabs.push(["users", "Users"], ["audit", "Audit log"]);
     if (PERMS.moderate.includes(u.role)) tabs.push(["reports", "Reports"]);
+    if (PERMS.users.includes(u.role)) tabs.unshift(["analytics", "Analytics"]);
     if (!tabs.length) { el.innerHTML = `<div class="notice warn">এই account-এর Admin অনুমতি নেই।</div>`; return; }
     el.innerHTML = `<div id="tabs" style="margin-bottom:20px">${tabs.map(([k, l]) => `<a href="#${k}" class="tag" data-tab="${k}">${l}</a>`).join("")}</div><div id="panel"></div>`;
     el.querySelector("#tabs").onclick = e => { const t = e.target.dataset.tab; if (t) { e.preventDefault(); open(t); } };
@@ -34,7 +35,7 @@
   function open(t) {
     tab = t; history.replaceState(null, "", "#" + t);
     el.querySelectorAll("[data-tab]").forEach(a => a.style.cssText = a.dataset.tab === t ? "background:var(--green);color:#fff" : "");
-    ({ users: showUsers, audit: showAudit, reports: showReports })[t]?.() ?? showList(t);
+    ({ users: showUsers, audit: showAudit, reports: showReports, analytics: showAnalytics })[t]?.() ?? showList(t);
   }
 
   async function showList(t) {
@@ -91,6 +92,38 @@
       <td>${u.id === user.id ? esc(u.role) : `<select data-uid="${u.id}">${roles.map(r => `<option ${r === u.role ? "selected" : ""}>${r}</option>`).join("")}</select>`}</td></tr>`).join("")}</table></div>`;
     panel().onchange = async e => { const id = e.target.dataset.uid; if (!id) return;
       try { await A.put(`/admin/users/${id}/role`, { role: e.target.value }); } catch (err) { alert(err.message); showUsers(); } };
+  }
+  async function showAnalytics() {
+    const a = await A.get("/admin/analytics"), n = x => Number(x).toLocaleString("en");
+    const tile = (label, value, sub = "") => `<div class="card stat"><span class="muted">${label}</span><strong>${value ?? "—"}</strong>${sub ? `<small class="muted">${sub}</small>` : ""}</div>`;
+    const max = Math.max(1, ...a.pageviews.map(d => d.count));
+    const hbars = (rows, label) => rows.length ? `<div class="hbars" role="list" aria-label="${label}">${rows.map(r => { const m = Math.max(...rows.map(x => x.count));
+      return `<div class="hb" role="listitem" title="${esc(r.key)}: ${n(r.count)}"><span class="hb-l">${esc(r.key)}</span><span class="hb-t"><span class="hb-b" style="width:${r.count / m * 100}%"></span><span class="hb-v">${n(r.count)}</span></span></div>`; }).join("")}</div>`
+      : `<p class="muted">এখনো data নেই।</p>`;
+    const table = (rows, h) => `<details style="margin-top:8px"><summary><small>Table view</small></summary><table><tr><th>${h}</th><th>Count</th></tr>${rows.map(r => `<tr><td>${esc(r.key || r.date)}</td><td>${n(r.count)}</td></tr>`).join("")}</table></details>`;
+    const sa = a.mocks.sectionAverages;
+    panel().innerHTML = `<div class="grid">${tile("Users", n(a.users.total), `+${a.users.new7} this week`)}${tile("Active learners (7 days)", n(a.users.active7), `${a.users.active30} in 30 days`)}
+        ${tile("Mocks completed", n(a.mocks.completed), `${a.mocks.started} started`)}${tile("Practice attempts", n(a.practiceAttempts))}
+        ${tile("AI feedback", n(a.aiFeedback), `${a.reviewsDone} teacher-reviewed`)}
+        ${tile("Avg mock band", Object.keys(sa).length ? Object.entries(sa).map(([k, v]) => `${k[0].toUpperCase()}${v}`).join(" · ") : "—", "per skill, indicative")}</div>
+      <div class="card" style="margin-top:24px"><h3>Page views · last 30 days</h3>
+        <div class="cols" role="img" aria-label="Daily page views, last 30 days, peak ${n(max)}">
+          ${a.pageviews.map(d => `<div class="col" tabindex="0" data-tip="${d.date}: ${n(d.count)} views"><span style="height:${d.count / max * 100}%"></span></div>`).join("")}</div>
+        <div class="cols-axis"><small class="muted">${a.pageviews[0].date}</small><small class="muted">peak ${n(max)}</small><small class="muted">${a.pageviews.at(-1).date}</small></div>
+        <div class="tip" hidden></div>${table(a.pageviews, "Date")}</div>
+      <div class="grid grid-2" style="margin-top:24px">
+        <div class="card"><h3>Top 20 weaknesses (most-missed question types)</h3>${hbars(a.topWeaknesses, "Most missed question types")}</div>
+        <div class="card"><h3>Most visited pages</h3>${hbars(a.topPages, "Most visited pages")}</div>
+        <div class="card"><h3>Most played videos</h3>${hbars(a.topVideos, "Most played videos")}</div>
+        <div class="card"><h3>Most shared posts</h3>${hbars(a.topShares, "Most shared posts")}</div></div>
+      <p class="muted" style="margin-top:12px"><small>শুধু দৈনিক মোট সংখ্যা রাখা হয় — কোনো IP, cookie বা ব্যক্তিগত পরিচয় নয়।</small></p>`;
+    const tip = panel().querySelector(".tip"), cols = panel().querySelector(".cols");
+    const show = c => { const r = c.getBoundingClientRect(), p = cols.getBoundingClientRect(); tip.hidden = false; tip.textContent = c.dataset.tip;
+      tip.style.left = Math.min(p.width - 150, Math.max(0, r.left - p.left - 60)) + "px"; };
+    cols.addEventListener("mouseover", e => { const c = e.target.closest(".col"); if (c) show(c); });
+    cols.addEventListener("focusin", e => { const c = e.target.closest(".col"); if (c) show(c); });
+    cols.addEventListener("mouseleave", () => tip.hidden = true);
+    panel().onclick = null; panel().onchange = null;
   }
   async function showReports() {
     const { reports } = await A.get("/admin/reports");

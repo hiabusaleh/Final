@@ -28,8 +28,14 @@
     if (!u) { slot.innerHTML = `<a href="${root}account/index.html" class="btn btn-primary" style="padding:6px 14px;color:#fff">Login</a>`; return; }
     slot.innerHTML = (["teacher", "super_admin"].includes(u.role) ? `<a href="${root}review/index.html">Review</a>` : "") +
       (!["student", "teacher"].includes(u.role) ? `<a href="${root}admin/index.html">Admin</a>` : "") +
+      `<a href="${root}notifications/index.html" title="Notifications" id="bell">🔔</a>` +
       `<a href="${root}account/index.html" title="Account">👤 ${esc(u.name.split(" ")[0])}</a>`;
+    call("GET", "/me/notifications").then(n => { if (n.unread) slot.querySelector("#bell").innerHTML = `🔔<sup style="background:var(--coral);color:#fff;border-radius:999px;padding:0 5px;font-size:.7rem">${n.unread}</sup>`; }).catch(() => {});
   });
+
+  /* privacy-conscious analytics: aggregate counters only */
+  window.PorchiAPI.track = (name, key) => online && call("POST", "/track", { name, key }).catch(() => {});
+  window.PorchiAPI.track("pageview", location.pathname);
 })();
 
 /* Posts/videos: when the server has published items, they replace the static data/posts.js entries */

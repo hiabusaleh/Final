@@ -28,6 +28,7 @@ module.exports = ({ route, fail, send, str, requireRole, db }) => {
     if (db.filter("partnerRequests", r => r.fromId === user.id && r.status === "pending").length >= 5) fail(429, "Too many pending invitations (max 5)");
     const r = db.insert("partnerRequests", { fromId: user.id, toId: to, scheduledAt: when.toISOString(), minutes: [15, 30, 45].includes(+body.minutes) ? +body.minutes : 30,
       note: str(body.note, "note", { optional: true, max: 140 }), status: "pending" });
+    db.insert("notifications", { userId: to, type: "partner_request", title: "Speaking practice-এর আমন্ত্রণ", body: `${firstName(user.id)} · ${when.toISOString().slice(0, 16).replace("T", " ")} UTC`, link: "collaborate/index.html", read: false });
     send(res, 201, { request: { id: r.id, status: r.status } });
   });
   route("GET", "/api/collab/partner/requests", async (req, res, { user }) => {
@@ -47,6 +48,7 @@ module.exports = ({ route, fail, send, str, requireRole, db }) => {
     db.update("partnerRequests", r.id, { status: { accept: "accepted", decline: "declined", cancel: "cancelled" }[action] });
     if (action !== "accept") return send(res, 200, { ok: true });
     if (blocked(r.fromId, r.toId)) fail(400, "This learner is not available");
+    db.insert("notifications", { userId: r.fromId, type: "partner_accepted", title: "আমন্ত্রণ গৃহীত", body: `${firstName(r.toId)} practice-এ রাজি`, link: "collaborate/index.html", read: false });
     const s = db.insert("partnerSessions", { requestId: r.id, userA: r.fromId, userB: r.toId, scheduledAt: r.scheduledAt, minutes: r.minutes, status: "scheduled" });
     send(res, 200, { session: view(s, user.id) });
   });

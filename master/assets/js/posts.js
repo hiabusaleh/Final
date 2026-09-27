@@ -26,6 +26,8 @@
   document.addEventListener("click", e => {
     const c = e.target.dataset.cat, cp = e.target.dataset.copy;
     if (c) { e.preventDefault(); active = c; render(); }
+    const sh = e.target.closest("article")?.id;
+    if (sh && e.target.classList.contains("tag") && e.target.closest(".btn-row")) window.PorchiAPI.track("post_share", sh);
     if (cp) { e.preventDefault(); navigator.clipboard?.writeText(location.href.split("#")[0] + "#" + cp); e.target.textContent = "Copied ✓"; }
   });
   render();
