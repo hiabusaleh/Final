@@ -7,7 +7,8 @@ const CAN = {
   content: ["content_editor", "super_admin"],
   questions: ["question_editor", "super_admin"],
   users: ["super_admin"],
-  review: ["teacher", "super_admin"]
+  review: ["teacher", "super_admin"],
+  moderate: ["super_admin"]
 };
 const SESSION_DAYS = 14;
 

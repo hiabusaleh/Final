@@ -47,7 +47,9 @@ listening: { url: "https://your-listening-site.com", newTab: false },
   versioned scoring (`server/scoring/rulesets.js`), question-type report, recommendations; Writing = review pending
 
 ## Collaborate (Speaking Partner, Study Rooms)
-Frontend: `collaborate/` · Backend: `server/routes/collaborate.js` (পরের ধাপ)। Real-time layer (WebSocket) ও
+**Phase A সম্পন্ন:** partner preferences + matching, Study Room (invite code, owner/host/participant/observer permission),
+block, report ও Admin → Reports moderation queue। Frontend: `collaborate/` · Backend: `server/routes/collaborate.js`।
+Phase B/C-র জন্য real-time layer (WebSocket) ও
 audio/video media layer লাগবে — `Porchi/PORCHI_EXCLUSIVE_FEATURES_FINAL_PLAN.md` §42, §53 দেখুন।
 
 ## যা কাজ করে
@@ -58,6 +60,6 @@ audio/video media layer লাগবে — `Porchi/PORCHI_EXCLUSIVE_FEATURES_FI
 - Practice filter, Search, mobile menu
 
 ## পরের ধাপ
-Collaborate Phase A (data model) → AI Teacher (provider-agnostic `AIService`) → Writing/Speaking feedback →
+Collaborate Phase B (Speaking Partner session) → AI Teacher (provider-agnostic `AIService`) → Writing/Speaking feedback →
 PostgreSQL-এ স্থানান্তর (`server/db.js`-এর function নাম একই রেখে)।
 সব score **indicative**; Porchi কোনো official IELTS partner নয়।

@@ -15,7 +15,7 @@
       ["description", "textarea", "Description"], ["duration", "text", "Duration"], ["relatedCourse", "text", "Related course (e.g. learn/reading/index.html)"],
       ["relatedPractice", "text", "Related practice"], ["status", m.STATUSES, "Status"]] }
   });
-  const PERMS = { content: ["content_editor", "super_admin"], questions: ["question_editor", "super_admin"], users: ["super_admin"] };
+  const PERMS = { content: ["content_editor", "super_admin"], questions: ["question_editor", "super_admin"], users: ["super_admin"], moderate: ["super_admin"] };
 
   let user, tab;
   A.me().then(u => {
@@ -23,6 +23,7 @@
     if (!u) { location.href = root + "account/index.html?next=" + encodeURIComponent(location.pathname); return; }
     const tabs = Object.entries(R).filter(([, r]) => PERMS[r.perm].includes(u.role)).map(([k, r]) => [k, r.label]);
     if (PERMS.users.includes(u.role)) tabs.push(["users", "Users"], ["audit", "Audit log"]);
+    if (PERMS.moderate.includes(u.role)) tabs.push(["reports", "Reports"]);
     if (!tabs.length) { el.innerHTML = `<div class="notice warn">এই account-এর Admin অনুমতি নেই।</div>`; return; }
     el.innerHTML = `<div id="tabs" style="margin-bottom:20px">${tabs.map(([k, l]) => `<a href="#${k}" class="tag" data-tab="${k}">${l}</a>`).join("")}</div><div id="panel"></div>`;
     el.querySelector("#tabs").onclick = e => { const t = e.target.dataset.tab; if (t) { e.preventDefault(); open(t); } };
@@ -33,7 +34,7 @@
   function open(t) {
     tab = t; history.replaceState(null, "", "#" + t);
     el.querySelectorAll("[data-tab]").forEach(a => a.style.cssText = a.dataset.tab === t ? "background:var(--green);color:#fff" : "");
-    ({ users: showUsers, audit: showAudit })[t]?.() ?? showList(t);
+    ({ users: showUsers, audit: showAudit, reports: showReports })[t]?.() ?? showList(t);
   }
 
   async function showList(t) {
@@ -90,6 +91,18 @@
       <td>${u.id === user.id ? esc(u.role) : `<select data-uid="${u.id}">${roles.map(r => `<option ${r === u.role ? "selected" : ""}>${r}</option>`).join("")}</select>`}</td></tr>`).join("")}</table></div>`;
     panel().onchange = async e => { const id = e.target.dataset.uid; if (!id) return;
       try { await A.put(`/admin/users/${id}/role`, { role: e.target.value }); } catch (err) { alert(err.message); showUsers(); } };
+  }
+  async function showReports() {
+    const { reports } = await A.get("/admin/reports");
+    panel().innerHTML = `<div style="overflow-x:auto"><table><tr><th>Date</th><th>Reporter → Reported</th><th>Type</th><th>Description</th><th>Status</th></tr>
+      ${reports.map(r => `<tr><td>${esc(r.createdAt.slice(0, 10))}</td><td>${esc(r.reporter)} → ${esc(r.reported)}
+        ${r.priorReports > 1 ? `<br><span class="tag soon">${r.priorReports} reports</span>` : ""}</td><td>${esc(r.event_type)}</td><td>${esc(r.description)}</td>
+        <td><select data-rid="${r.id}">${["open", "reviewing", "resolved", "dismissed"].map(s => `<option ${s === r.status ? "selected" : ""}>${s}</option>`).join("")}</select></td></tr>`).join("")
+        || `<tr><td colspan="5" class="muted">কোনো report নেই।</td></tr>`}</table></div>`;
+    panel().onclick = null;
+    panel().onchange = async e => { const id = e.target.dataset.rid; if (!id) return;
+      const resolution = e.target.value === "resolved" || e.target.value === "dismissed" ? prompt("Resolution note (optional)") || "" : "";
+      await A.put(`/admin/reports/${id}`, { status: e.target.value, resolution }); };
   }
   async function showAudit() {
     const { audit } = await A.get("/admin/audit");
