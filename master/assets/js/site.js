@@ -25,7 +25,7 @@
       <button class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
       <nav class="nav" aria-label="Main">
         ${nav.map(([id, href, label]) =>
-          `<a href="${root}${href}${href ? "index.html" : "index.html"}" class="${id === page ? "active" : ""}">${label}</a>`).join("")}
+          `<a href="${root}${href}index.html" class="${id === page ? "active" : ""}">${label}</a>`).join("")}
       </nav>
     </div>`;
   document.body.prepend(header);
