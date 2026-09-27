@@ -32,3 +32,14 @@ qs.forEach(([question_type, prompt, options, correct_answer, explanation, diffic
     explanation, skill_tag: "reading", subskill_tag: question_type, difficulty, exam_version: "IELTS_FORMAT_2026_V1", version: 1, history: [] }));
 
 console.log(`Seeded 1 passage and ${qs.length} original reading questions.`);
+
+const ids = db.all("questions").filter(q => q.passage_id === passage.id).map(q => q.id);
+db.insert("mocks", { title: "Porchi Mini Mock 1 — Reading + Writing", test_profile: "ielts-academic", mode: "mini", status: "published",
+  description: "Original short Reading passage (10 questions) and one Writing Task 2 prompt. Indicative band only.",
+  exam_version: "IELTS_FORMAT_2026_V1", version: 1, history: [],
+  sections: [
+    { skill: "reading", minutes: 15, questionIds: ids, task: "", minWords: 0 },
+    { skill: "writing", minutes: 40, questionIds: [], minWords: 250,
+      task: "Some people believe that every new building in a city should include a garden on its roof. To what extent do you agree or disagree?\n\nGive reasons for your answer and include any relevant examples from your own knowledge or experience.\n\nWrite at least 250 words." }
+  ] });
+console.log("Seeded 1 published mini mock.");

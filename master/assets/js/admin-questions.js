@@ -14,3 +14,7 @@ window.PorchiAdminResources = Object.assign(window.PorchiAdminResources || {}, {
     ["title", "text", "Title"], ["module", m.SKILLS, "Module"], ["text", "textarea", "Text"],
     ["source_type", "text", "Source type"], ["author", "text", "Author"], ["license_status", m.LICENSE, "License status"], ["status", m.STATUSES, "Status"]] }
 });
+window.PorchiAdminResources.mocks = { label: "Mock Tests", perm: "questions", cols: ["title", "test_profile", "mode", "status", "version"], fields: m => [
+  ["title", "text", "Title"], ["test_profile", m.PROFILES, "Test profile"], ["mode", m.MODES, "Mode"], ["description", "textarea", "Description"],
+  ["sections", "json", 'Sections — JSON: [{"skill":"reading","minutes":20,"questionIds":["id1","id2"]},{"skill":"writing","minutes":40,"task":"…","minWords":250}]'],
+  ["exam_version", "text", "Exam version"], ["status", ["draft", "published", "archived"], "Status"]] };

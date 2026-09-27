@@ -17,7 +17,7 @@
         `<option value="${v}" ${v === 2 ? "selected" : ""}>${o}</option>`).join("")}</select>`).join("")).join("");
 
   const toBand = avg => Math.min(9, Math.round((3.5 + avg * 1.25) * 2) / 2); // 0..4 → 3.5..8.5, indicative
-  const overall = b => { const a = b.reduce((x, y) => x + y, 0) / b.length; return Math.round(a * 2) / 2; }; // simplified; official IELTS rounding rules differ at .25/.75
+  const overall = b => { const a = b.reduce((x, y) => x + y, 0) / b.length; return Math.round(a * 2) / 2; }; // nearest half band, .25/.75 round up (IELTS rule)
 
   document.getElementById("diag").addEventListener("submit", e => {
     e.preventDefault();
