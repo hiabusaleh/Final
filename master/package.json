@@ -1,0 +1,18 @@
+{
+  "name": "porchi-master",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Porchi IELTS master platform",
+  "scripts": {
+    "start": "node server/server.js",
+    "admin": "node server/create-admin.js",
+    "seed": "node server/seed.js",
+    "test": "node --test server/tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "optionalDependencies": {
+    "@anthropic-ai/sdk": "^0.128.0"
+  }
+}
