@@ -1,0 +1,25 @@
+/* Porchi design tokens — Brand Guide §8. Change colours/fonts here only. */
+:root {
+  --ink: #13251D;          /* Porchi Ink — text, dark surfaces */
+  --green: #147D67;        /* Progress Green — CTA, links */
+  --green-dark: #0F5F4E;
+  --lime: #A8D86D;         /* Growth Lime — small highlights only */
+  --paper: #F7F4EC;        /* Warm Paper — page background */
+  --mist: #E8F1EC;         /* Mist — cards, quiet states */
+  --coral: #E86C54;        /* Signal Coral — errors/urgent only */
+  --white: #FFFFFF;
+  --muted: #4A5D54;
+  --line: #D6E2DB;
+
+  --font-bn: "Noto Sans Bengali", sans-serif;
+  --font-head: "Plus Jakarta Sans", "Noto Sans Bengali", sans-serif;
+  --font-ui: "Inter", "Noto Sans Bengali", sans-serif;
+  --font-read: "Source Serif 4", Georgia, serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 10px rgba(19, 37, 29, .06);
+  --max: 1160px;
+  --gap: 24px;
+}
