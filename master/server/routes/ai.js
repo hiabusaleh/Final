@@ -1,13 +1,15 @@
 /* AI Teacher endpoints (Blueprint §16, §33). All outputs are stored and labelled as AI estimates, open to later human review. */
 const ai = require("../ai/service");
 
+const flags = require("../flags");
 module.exports = ({ route, fail, send, str, requireRole, db, auth }) => {
+  const gate = name => { if (!flags.on(name)) fail(503, "This feature is switched off by the administrator"); };
   const limit = user => { if (auth.limited("ai:" + user.id, 30, 60 * 60e3)) fail(429, "AI limit reached (30 per hour) — try later"); };
   const run = async fn => { try { return await fn(); } catch (e) { if (e.status) fail(e.status, e.message); console.error(e); fail(502, "AI service error"); } };
   const save = (user, kind, input, result, extra = {}) =>
     (require("../activity").mark(user.id), db.insert("aiFeedback", { userId: user.id, kind, input, result, reviewStatus: "ai_only", ...extra })); // teacher review can be added later
 
-  route("GET", "/api/ai/status", async (req, res) => send(res, 200, ai.status()));
+  route("GET", "/api/ai/status", async (req, res) => send(res, 200, { ...ai.status(), writing: flags.on("AI_WRITING_ENABLED"), speaking: flags.on("AI_SPEAKING_ENABLED") }));
 
   /* Explain a question the learner has already attempted (prevents answer fishing) */
   route("POST", "/api/ai/explain", async (req, res, { user, body }) => {
@@ -24,7 +26,7 @@ module.exports = ({ route, fail, send, str, requireRole, db, auth }) => {
 
   /* Writing feedback — free text, or a writing section from one of the learner's mock attempts */
   route("POST", "/api/ai/writing", async (req, res, { user, body }) => {
-    requireRole(user); limit(user);
+    requireRole(user); gate("AI_WRITING_ENABLED"); limit(user);
     let task, response, attempt, sectionIndex;
     if (body.attemptId) {
       attempt = db.find("attempts", a => a.id === body.attemptId && a.userId === user.id && a.status === "submitted") || fail(404, "Attempt not found");
@@ -49,7 +51,7 @@ module.exports = ({ route, fail, send, str, requireRole, db, auth }) => {
   });
 
   route("POST", "/api/ai/speaking", async (req, res, { user, body }) => {
-    requireRole(user); limit(user);
+    requireRole(user); gate("AI_SPEAKING_ENABLED"); limit(user);
     const prompt = str(body.prompt, "Prompt", { min: 5, max: 2000 }), transcript = str(body.transcript, "Transcript", { min: 20, max: 8000 });
     const result = await run(() => ai.analyzeSpeaking({ prompt, transcript, part: ["Part 1", "Part 2", "Part 3"].includes(body.part) ? body.part : "Part 2" }));
     let audioId;

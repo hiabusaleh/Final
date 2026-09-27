@@ -12,6 +12,7 @@ module.exports = ({ route, fail, send, str, requireRole, audit, db }) => {
   route("POST", "/api/me/ai-feedback/:id/request-review", async (req, res, { user, params, body }) => {
     requireRole(user);
     const f = db.find("aiFeedback", x => x.id === params.id && x.userId === user.id) || fail(404, "Not found");
+    if (!require("../flags").on("TEACHER_REVIEW_ENABLED")) fail(503, "Teacher review is not available right now");
     if (!reviewable(f)) fail(400, "Only writing and speaking feedback can be reviewed");
     if (f.reviewStatus !== "ai_only") fail(409, "Review already requested");
     if (db.filter("aiFeedback", x => x.userId === user.id && ["requested", "claimed"].includes(x.reviewStatus)).length >= 3) fail(429, "You can have 3 open review requests at a time");

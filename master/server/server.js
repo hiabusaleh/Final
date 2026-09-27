@@ -128,7 +128,7 @@ route("GET", "/api/admin/audit", async (req, res, { user }) => {
 });
 
 /* Feature modules register more routes */
-for (const m of ["content", "questions", "mocks", "collaborate", "partner", "ai", "review", "recordings", "notifications", "analytics", "vocab", "plan"]) {
+for (const m of ["content", "questions", "mocks", "collaborate", "partner", "ai", "review", "recordings", "notifications", "analytics", "vocab", "plan", "settings"]) {
   const f = path.join(__dirname, "routes", m + ".js");
   if (fs.existsSync(f)) require(f)({ route, fail, send, str, requireRole, audit, db, auth });
 }
@@ -157,6 +157,7 @@ const server = http.createServer(async (req, res) => {
   try {
     const r = routes.find(r => r.method === req.method && r.re.test(url.pathname));
     if (!r) fail(404, "Not found");
+    if (url.pathname.startsWith("/api/collab/") && !require("./flags").on("COLLABORATE_ENABLED")) fail(503, "Porchi Collaborate is switched off");
     // CSRF: SameSite=Strict cookie + mutating requests must be JSON (cross-site forms cannot send it without CORS)
     if (req.method !== "GET" && !String(req.headers["content-type"] || "").startsWith("application/json")) fail(415, "JSON required");
     const params = Object.fromEntries(r.keys.map((k, i) => [k, decodeURIComponent(r.re.exec(url.pathname)[i + 1])]));
