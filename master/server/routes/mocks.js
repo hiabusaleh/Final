@@ -114,6 +114,7 @@ module.exports = ({ route, fail, send, str, requireRole, audit, db }) => {
       recommendations: ranked.filter(r => r.accuracy < 0.6).slice(0, 3).map(r => ({ type: r.type, module: r.module,
         steps: ["Course lesson: " + r.type, "15–20 targeted questions", "Mistake Book review", "Retry after 48 hours"] }))
     };
+    require("../activity").mark(user.id);
     db.update("attempts", a.id, { status: "submitted", submittedAt: new Date().toISOString(), items, report, score: report.raw, total: report.total });
     for (const i of items.filter(i => !i.correct)) db.insert("mistakes", { userId: user.id, attemptId: a.id, questionId: i.id, questionVersion: i.version,
       module: i.module, question_type: i.question_type, given: i.given, category: "Unclassified", reviewed: false });

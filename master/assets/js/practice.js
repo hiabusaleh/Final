@@ -26,7 +26,8 @@
   if (!A.online) return;
   let started = Date.now();
   async function load() {
-    const qs = new URLSearchParams({ skill: $("f-skill").value, type: $("f-type").value, difficulty: $("f-diff").value, limit: 15 });
+    const random = new URLSearchParams(location.search).get("random") === "1";
+    const qs = new URLSearchParams({ skill: $("f-skill").value, type: $("f-type").value, difficulty: $("f-diff").value, limit: random ? 5 : 15, random: random ? 1 : 0 });
     const { questions, passages, total } = await A.get("/practice?" + qs);
     if (!questions.length) return; // keep the "no questions yet" notice
     started = Date.now();

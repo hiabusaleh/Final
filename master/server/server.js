@@ -97,7 +97,7 @@ route("DELETE", "/api/me", async (req, res, { user }) => {
   requireRole(user);
   if (user.role === "super_admin" && db.filter("users", u => u.role === "super_admin").length === 1) fail(400, "Last super admin cannot be deleted");
   require("./routes/recordings").purgeUser?.(user.id, db);
-  for (const t of ["attempts", "mistakes", "sessions", "partnerPrefs", "blocks", "aiFeedback", "notifications"]) db.removeWhere(t, x => x.userId === user.id);
+  for (const t of ["attempts", "mistakes", "sessions", "partnerPrefs", "blocks", "aiFeedback", "notifications", "vocabProgress", "vocabCustom", "activity"]) db.removeWhere(t, x => x.userId === user.id);
   db.removeWhere("partnerRequests", r => r.fromId === user.id || r.toId === user.id);
   db.remove("users", user.id);
   send(res, 200, { ok: true }, { "Set-Cookie": auth.cookie("", SECURE) });
@@ -121,7 +121,7 @@ route("GET", "/api/admin/audit", async (req, res, { user }) => {
 });
 
 /* Feature modules register more routes */
-for (const m of ["content", "questions", "mocks", "collaborate", "partner", "ai", "review", "recordings", "notifications", "analytics"]) {
+for (const m of ["content", "questions", "mocks", "collaborate", "partner", "ai", "review", "recordings", "notifications", "analytics", "vocab"]) {
   const f = path.join(__dirname, "routes", m + ".js");
   if (fs.existsSync(f)) require(f)({ route, fail, send, str, requireRole, audit, db, auth });
 }

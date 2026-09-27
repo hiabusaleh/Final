@@ -100,11 +100,12 @@ module.exports = ({ route, fail, send, str, requireRole, audit, db }) => {
 
   route("GET", "/api/practice", async (req, res, { query }) => {
     const skill = query.get("skill"), type = query.get("type"), diff = query.get("difficulty");
-    const limit = Math.min(20, +query.get("limit") || 10), offset = Math.max(0, +query.get("offset") || 0);
+    const limit = Math.min(20, +query.get("limit") || 10), offset = Math.max(0, +query.get("offset") || 0), random = query.get("random") === "1";
     const all = db.filter("questions", q => q.status === "published" && (!skill || q.module === skill)
       && (!type || type === "All" || q.question_type === type) && (!diff || diff === "Any" || q.difficulty === diff))
       .sort((a, b) => String(a.passage_id).localeCompare(String(b.passage_id)) || a.question_number - b.question_number);
-    const page = all.slice(offset, offset + limit);
+    if (random) for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
+    const page = random ? all.slice(0, limit).sort((a, b) => String(a.passage_id).localeCompare(String(b.passage_id)) || a.question_number - b.question_number) : all.slice(offset, offset + limit);
     const pids = [...new Set(page.map(q => q.passage_id).filter(Boolean))];
     send(res, 200, { total: all.length, questions: page.map(publicQ),
       passages: db.filter("passages", p => pids.includes(p.id)).map(({ history, ...p }) => p) });
@@ -120,6 +121,7 @@ module.exports = ({ route, fail, send, str, requireRole, audit, db }) => {
     }).filter(r => !r.error);
     const score = results.filter(r => r.correct).length;
     if (user) {
+      require("../activity").mark(user.id);
       const attempt = db.insert("attempts", { userId: user.id, kind: "practice", seconds: +body.seconds || 0,
         items: results.map(({ explanation, ...r }) => r), score, total: results.length });
       for (const r of results.filter(r => !r.correct)) {

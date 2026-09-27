@@ -5,7 +5,7 @@ module.exports = ({ route, fail, send, str, requireRole, db, auth }) => {
   const limit = user => { if (auth.limited("ai:" + user.id, 30, 60 * 60e3)) fail(429, "AI limit reached (30 per hour) — try later"); };
   const run = async fn => { try { return await fn(); } catch (e) { if (e.status) fail(e.status, e.message); console.error(e); fail(502, "AI service error"); } };
   const save = (user, kind, input, result, extra = {}) =>
-    db.insert("aiFeedback", { userId: user.id, kind, input, result, reviewStatus: "ai_only", ...extra }); // teacher review can be added later
+    (require("../activity").mark(user.id), db.insert("aiFeedback", { userId: user.id, kind, input, result, reviewStatus: "ai_only", ...extra })); // teacher review can be added later
 
   route("GET", "/api/ai/status", async (req, res) => send(res, 200, ai.status()));
 

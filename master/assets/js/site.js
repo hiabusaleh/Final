@@ -50,6 +50,7 @@
           <li><a href="${root}practice/index.html">Practice</a></li>
           <li><a href="${root}mock-tests/index.html">Mock Tests</a></li>
           <li><a href="${root}study-plan/index.html">Study Plan</a></li>
+          <li><a href="${root}vocabulary/index.html">Vocabulary</a> · <a href="${root}grammar/index.html">Grammar</a></li>
           <li><a href="${root}collaborate/index.html">Porchi Collaborate</a></li>
         </ul></div>
         <div><strong>Info</strong><ul>

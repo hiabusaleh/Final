@@ -25,6 +25,13 @@
   }
 
   if ($("dash") && user) {
+    window.PorchiAPI.get("/me/streak").then(k => {
+      const box = document.createElement("div"); box.className = "card"; box.style.marginTop = "24px";
+      box.innerHTML = `<h3>${k.current ? `🔥 আজও পড়ছি — টানা ${k.current} দিন` : "পড়া থেমেছিল? স্বপ্ন থামেনি। আজ ১০ মিনিট দিয়ে ফিরি।"}</h3>
+        <div style="display:flex;gap:3px;margin-top:8px" role="img" aria-label="Study days in the last 30 days">${k.last30.map(d => `<span title="${d.date}${d.active ? " ✓" : ""}" style="flex:1;height:14px;border-radius:3px;background:${d.active ? "var(--green)" : "var(--mist)"}"></span>`).join("")}</div>
+        <small class="muted">গত ৩০ দিন · সবচেয়ে লম্বা streak ${k.longest} দিন ${k.today ? "" : `· <a href="${root}practice/micro/index.html">আজকের ছোট practice →</a>`}</small>`;
+      $("dash").querySelector("h1").after(box);
+    }).catch(() => {});
     window.PorchiAPI.get("/me/stats").then(st => {
       const rows = Object.entries(st.byType).sort((a, b) => a[1].correct / a[1].attempted - b[1].correct / b[1].attempted);
       $("live-stats").innerHTML = `<h2 style="margin-top:32px">Practice performance</h2>
