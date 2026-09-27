@@ -58,6 +58,21 @@ listening: { url: "https://your-listening-site.com", newTab: false },
 
 Phase C (Study Room-এ live shared page, whiteboard, chat, group call) বাকি — এর জন্য group call-এ media server (SFU) লাগবে।
 
+## AI Teacher (Blueprint §16, §33, §56)
+Provider-agnostic `server/ai/service.js` (`explainQuestion`, `gradeWriting`, `analyzeSpeaking`, `chat`) — provider বদলাতে শুধু
+`server/ai/providers/`-এ নতুন ফাইল যোগ করুন। Default provider: Claude (official `@anthropic-ai/sdk`, model `claude-opus-5`)।
+```bash
+cd master && npm install                 # শুধু AI-এর জন্য SDK (optional)
+ANTHROPIC_API_KEY=sk-ant-... npm start   # AI চালু
+PORCHI_AI_PROVIDER=demo npm start        # API key ছাড়া "[DEMO]" উত্তর দিয়ে screen দেখা
+PORCHI_AI_PROVIDER=none npm start        # AI বন্ধ
+```
+- AI Teacher পেজ: chat, Writing feedback (চারটি criterion-এ band + প্রমাণ + উন্নত paragraph), Speaking transcript feedback
+- Practice: ভুল উত্তরের পাশে "AI ব্যাখ্যা" (evidence, paraphrase, distractor) — উত্তর দেওয়ার পরেই শুধু পাওয়া যায়
+- Mock result: Writing section-এ "AI feedback নিই" → band "AI estimate" হিসেবে যুক্ত হয়
+- সব AI output "Porchi AI estimate" চিহ্নিত, `aiFeedback`-এ সংরক্ষিত (`reviewStatus: ai_only` — পরে শিক্ষক review যুক্ত হবে)
+- প্রতি user ঘণ্টায় ৩০টি AI request; learner-এর লেখা AI-কে পাঠানোর আগে কখনো auto-correct হয় না
+
 ## যা কাজ করে
 - Diagnostic → indicative band, strengths/weaknesses (ব্রাউজারে সংরক্ষিত)
 - Diagnostic থেকে সপ্তাহভিত্তিক Study Plan, Dashboard ও Progress
@@ -66,6 +81,6 @@ Phase C (Study Room-এ live shared page, whiteboard, chat, group call) বা�
 - Practice filter, Search, mobile menu
 
 ## পরের ধাপ
-AI Teacher (provider-agnostic `AIService`) → Writing/Speaking feedback →
+Teacher review (AI + human hybrid, §33) → Speaking recorder (§34) → Collaborate Phase C →
 PostgreSQL-এ স্থানান্তর (`server/db.js`-এর function নাম একই রেখে)।
 সব score **indicative**; Porchi কোনো official IELTS partner নয়।

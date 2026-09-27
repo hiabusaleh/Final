@@ -120,7 +120,7 @@ route("GET", "/api/admin/audit", async (req, res, { user }) => {
 });
 
 /* Feature modules register more routes */
-for (const m of ["content", "questions", "mocks", "collaborate", "partner"]) {
+for (const m of ["content", "questions", "mocks", "collaborate", "partner", "ai"]) {
   const f = path.join(__dirname, "routes", m + ".js");
   if (fs.existsSync(f)) require(f)({ route, fail, send, str, requireRole, audit, db, auth });
 }

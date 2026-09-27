@@ -9,5 +9,10 @@
     "seed": "node server/seed.js",
     "test": "node --test server/tests/*.test.js"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  },
+  "optionalDependencies": {
+    "@anthropic-ai/sdk": "^0.128.0"
+  }
 }

@@ -54,7 +54,8 @@
       r.results.forEach(x => {
         const box = e.target.querySelector(`[data-q="${x.id}"] .fb`);
         box.innerHTML = `<div class="notice ${x.correct ? "" : "warn"}">${x.correct ? "✓ সঠিক" : `✗ সঠিক উত্তর: <strong>${esc([].concat(x.correct_answer).join(", "))}</strong>`}
-          ${x.explanation ? `<br><small>${esc(x.explanation)}</small>` : ""}</div>`;
+          ${x.explanation ? `<br><small>${esc(x.explanation)}</small>` : ""}
+          ${!x.correct && r.saved && aiOn ? `<br><a href="#" data-ai="${x.id}" data-given="${esc([].concat(x.given).join(", "))}">🤖 AI Teacher-এর ব্যাখ্যা</a>` : ""}</div><div class="ai-out"></div>`;
       });
       $("pscore").innerHTML = `<span class="score">${r.score}/${r.total}</span> ${r.saved ? "· ভুলগুলো Mistake Book-এ গেছে"
         : `· <a href="${root}account/index.html?next=${encodeURIComponent(location.pathname)}">Login</a> করলে ভুলগুলো সংরক্ষিত হবে`}`;
@@ -77,6 +78,13 @@
     box.onclick = async e => { if (!e.target.dataset.done) return; e.preventDefault();
       await A.put(`/me/mistakes/${e.target.dataset.done}`, { reviewed: true }); loadMistakes(); };
   }
+  const aiOn = (await A.get("/ai/status").catch(() => ({}))).enabled;
+  $("practice-out").addEventListener("click", async e => {
+    const qid = e.target.dataset.ai; if (!qid) return; e.preventDefault();
+    const out = e.target.closest("[data-q]").querySelector(".ai-out"); e.target.textContent = "AI ভাবছে…";
+    try { const { result } = await A.post("/ai/explain", { questionId: qid, given: e.target.dataset.given }); out.innerHTML = window.PorchiAI.explain(result); e.target.remove(); }
+    catch (x) { out.innerHTML = `<div class="notice warn">${esc(x.message)}</div>`; e.target.textContent = "🤖 আবার চেষ্টা করি"; }
+  });
   ["f-skill", "f-type", "f-diff", "f-band"].forEach(id => $(id).addEventListener("change", () => load().catch(() => {})));
   load().catch(() => {}); loadMistakes().catch(() => {});
 })();
