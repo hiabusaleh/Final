@@ -52,7 +52,9 @@ module.exports = ({ route, fail, send, str, requireRole, db, auth }) => {
     requireRole(user); limit(user);
     const prompt = str(body.prompt, "Prompt", { min: 5, max: 2000 }), transcript = str(body.transcript, "Transcript", { min: 20, max: 8000 });
     const result = await run(() => ai.analyzeSpeaking({ prompt, transcript, part: ["Part 1", "Part 2", "Part 3"].includes(body.part) ? body.part : "Part 2" }));
-    const fb = save(user, "speaking", { prompt, transcript }, result);
+    let audioId;
+    if (body.recordingId) audioId = (db.find("recordings", r => r.id === body.recordingId && r.userId === user.id) || fail(404, "Recording not found")).id;
+    const fb = save(user, "speaking", { prompt, transcript, audioId, part: body.part }, result);
     send(res, 200, { result, id: fb.id });
   });
 

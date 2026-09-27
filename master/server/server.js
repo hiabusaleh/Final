@@ -29,9 +29,9 @@ function send(res, status, body, headers = {}) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", ...headers });
   res.end(JSON.stringify(body));
 }
-async function readJson(req) {
+async function readJson(req, max = 1e6) {
   let size = 0; const chunks = [];
-  for await (const c of req) { size += c.length; if (size > 1e6) fail(413, "Body too large"); chunks.push(c); }
+  for await (const c of req) { size += c.length; if (size > max) fail(413, "Body too large"); chunks.push(c); }
   if (!chunks.length) return {};
   try { return JSON.parse(Buffer.concat(chunks).toString("utf8")); } catch { fail(400, "Invalid JSON"); }
 }
@@ -96,7 +96,8 @@ route("PUT", "/api/me/profile", async (req, res, { user, body }) => {
 route("DELETE", "/api/me", async (req, res, { user }) => {
   requireRole(user);
   if (user.role === "super_admin" && db.filter("users", u => u.role === "super_admin").length === 1) fail(400, "Last super admin cannot be deleted");
-  for (const t of ["attempts", "mistakes", "sessions", "partnerPrefs", "blocks"]) db.removeWhere(t, x => x.userId === user.id);
+  require("./routes/recordings").purgeUser?.(user.id, db);
+  for (const t of ["attempts", "mistakes", "sessions", "partnerPrefs", "blocks", "aiFeedback", "notifications"]) db.removeWhere(t, x => x.userId === user.id);
   db.removeWhere("partnerRequests", r => r.fromId === user.id || r.toId === user.id);
   db.remove("users", user.id);
   send(res, 200, { ok: true }, { "Set-Cookie": auth.cookie("", SECURE) });
@@ -120,7 +121,7 @@ route("GET", "/api/admin/audit", async (req, res, { user }) => {
 });
 
 /* Feature modules register more routes */
-for (const m of ["content", "questions", "mocks", "collaborate", "partner", "ai", "review"]) {
+for (const m of ["content", "questions", "mocks", "collaborate", "partner", "ai", "review", "recordings"]) {
   const f = path.join(__dirname, "routes", m + ".js");
   if (fs.existsSync(f)) require(f)({ route, fail, send, str, requireRole, audit, db, auth });
 }
@@ -152,7 +153,7 @@ const server = http.createServer(async (req, res) => {
     // CSRF: SameSite=Strict cookie + mutating requests must be JSON (cross-site forms cannot send it without CORS)
     if (req.method !== "GET" && !String(req.headers["content-type"] || "").startsWith("application/json")) fail(415, "JSON required");
     const params = Object.fromEntries(r.keys.map((k, i) => [k, decodeURIComponent(r.re.exec(url.pathname)[i + 1])]));
-    const body = req.method === "GET" ? {} : await readJson(req);
+    const body = req.method === "GET" ? {} : await readJson(req, r.opts.maxBody);
     await r.handler(req, res, { user: auth.userFromReq(req), body, params, query: url.searchParams });
   } catch (e) {
     if (!(e instanceof HttpError)) console.error(e);
