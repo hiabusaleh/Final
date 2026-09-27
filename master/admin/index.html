@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin — Porchi IELTS</title>
+  <meta property="og:title" content="Admin — Porchi IELTS">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+Bengali:wght@400;600&family=Plus+Jakarta+Sans:wght@700;800&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+</head>
+<body data-root="../" data-page="">
+<main>
+  <section class="page-hero"><div class="container">
+    <div class="eyebrow">Admin / CMS</div><h1>Admin</h1>
+    <div class="notice warn">এটি শুধু কাঠামো। আসল Admin-এর জন্য backend, secure login ও role-based access লাগবে (Blueprint §23, §24, §43)।
+      ততদিন content <code>data/</code> ফোল্ডারের ফাইলে সম্পাদনা করুন।</div>
+    <div class="grid" style="margin-top:20px">
+      <div class="card"><h3>Posts</h3><p><code>data/posts.js</code> → posts</p></div>
+      <div class="card"><h3>Videos</h3><p><code>data/posts.js</code> → videos</p></div>
+      <div class="card"><h3>Module links</h3><p><code>assets/js/config.js</code></p></div>
+      <div class="card"><h3>Taxonomy &amp; modules</h3><p><code>data/content.js</code></p></div>
+      <div class="card"><h3>Test profiles &amp; flags</h3><p><code>data/test-profiles.js</code></p></div>
+      <div class="card"><h3>Users · Question Bank · Mock Tests · Analytics</h3><p>Backend প্রয়োজন</p><span class="tag soon">Future</span></div>
+    </div>
+    <h2 style="margin-top:40px">Roles (planned)</h2>
+    <table><tr><th>Role</th><th>Access</th></tr>
+      <tr><td>Super Admin</td><td>Everything</td></tr><tr><td>Content Editor</td><td>Posts, videos, lessons, resources</td></tr>
+      <tr><td>Question Editor</td><td>Questions, mock tests</td></tr><tr><td>Teacher / Assessor</td><td>Writing/Speaking evaluation</td></tr>
+      <tr><td>Student</td><td>Learning and test-taking only</td></tr></table>
+  </div></section>
+</main>
+<script src="../assets/js/config.js"></script>
+<script src="../data/content.js"></script>
+<script src="../data/test-profiles.js"></script>
+<script src="../data/posts.js"></script>
+<script src="../assets/js/site.js"></script>
+</body>
+</html>
