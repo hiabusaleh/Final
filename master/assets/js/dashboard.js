@@ -17,9 +17,21 @@
       <h2 style="margin-top:32px">Skills</h2><div class="grid">${Object.entries(d.bands).map(([s, b]) =>
         `<div class="card"><h3>${cap(s)} · ${b.toFixed(1)}</h3><div class="progress"><div style="width:${b / 9 * 100}%"></div></div></div>`).join("")}</div>
       <div class="btn-row" style="margin-top:24px"><a class="btn btn-primary" href="${root}study-plan/index.html">Continue Study Plan</a></div>`) + `
+      <div id="live-stats"></div>
       <h2 style="margin-top:40px">Coming next</h2><div class="grid">
         ${["Today's Tasks", "Weak Areas", "Recent Tests", "Saved Items", "Mistake Book"].map(x =>
           `<div class="card"><h3>${x}</h3><span class="tag soon">Account system-এর পর</span></div>`).join("")}</div>`;
+  }
+
+  if ($("dash") && user) {
+    window.PorchiAPI.get("/me/stats").then(st => {
+      const rows = Object.entries(st.byType).sort((a, b) => a[1].correct / a[1].attempted - b[1].correct / b[1].attempted);
+      $("live-stats").innerHTML = `<h2 style="margin-top:32px">Practice performance</h2>
+        <p>Attempted ${st.attempted} · Correct ${st.correct} · Accuracy ${st.attempted ? Math.round(st.correct / st.attempted * 100) : 0}% ·
+        <a href="${root}practice/index.html#mistakes">Open mistakes: ${st.openMistakes}</a></p>
+        ${rows.length ? `<table><tr><th>Question type</th><th>Accuracy</th></tr>${rows.map(([k, v]) =>
+          `<tr><td>${window.Porchi.esc(k)}</td><td>${v.correct}/${v.attempted}</td></tr>`).join("")}</table>` : ""}`;
+    }).catch(() => {});
   }
 
   if ($("plan")) {

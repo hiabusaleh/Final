@@ -87,3 +87,5 @@ input:focus, select:focus, textarea:focus, .btn:focus-visible, a:focus-visible {
 table { width: 100%; border-collapse: collapse; background: var(--white); }
 th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
 .video-frame { aspect-ratio: 16 / 9; width: 100%; border: 0; border-radius: var(--radius); }
+.card > .tag, .card > small.tag, .card > div > .tag { align-self: flex-start; }
+.card small.tag { display: inline-block; }
