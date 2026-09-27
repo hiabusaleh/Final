@@ -26,7 +26,8 @@
   me().then(u => {
     const esc = window.Porchi.esc;
     if (!u) { slot.innerHTML = `<a href="${root}account/index.html" class="btn btn-primary" style="padding:6px 14px;color:#fff">Login</a>`; return; }
-    slot.innerHTML = (u.role !== "student" ? `<a href="${root}admin/index.html">Admin</a>` : "") +
+    slot.innerHTML = (["teacher", "super_admin"].includes(u.role) ? `<a href="${root}review/index.html">Review</a>` : "") +
+      (!["student", "teacher"].includes(u.role) ? `<a href="${root}admin/index.html">Admin</a>` : "") +
       `<a href="${root}account/index.html" title="Account">👤 ${esc(u.name.split(" ")[0])}</a>`;
   });
 })();

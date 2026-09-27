@@ -10,6 +10,7 @@
       .map(([k, l]) => `<a href="#" class="tag" data-t="${k}">${l}</a>`).join("")}</div><div id="ai-panel"></div>`;
   const panel = el.querySelector("#ai-panel"), history = [];
   const busy = (btn, on) => { btn.disabled = on; btn.textContent = on ? "AI ভাবছে…" : btn.dataset.label; };
+  const saved = id => `<div class="notice" style="margin-top:16px">সংরক্ষিত হয়েছে। শিক্ষকের যাচাই চাইলে → <a href="${root}feedback/index.html?id=${id}">শিক্ষকের review চাই</a></div>`;
   const fail = (box, e) => box.innerHTML = `<div class="notice warn">${esc(e.message)}</div>`;
 
   const views = {
@@ -38,7 +39,7 @@
       const f = panel.querySelector("#wf");
       f.response.oninput = () => panel.querySelector("#wc").textContent = f.response.value.trim().split(/\s+/).filter(Boolean).length;
       f.onsubmit = async e => { e.preventDefault(); const btn = f.querySelector("button"), out = panel.querySelector("#wout"); busy(btn, true);
-        try { const { result } = await A.post("/ai/writing", Object.fromEntries(new FormData(f))); out.innerHTML = R.writing(result); } catch (x) { fail(out, x); }
+        try { const { result, id } = await A.post("/ai/writing", Object.fromEntries(new FormData(f))); out.innerHTML = R.writing(result) + saved(id); } catch (x) { fail(out, x); }
         busy(btn, false); };
     },
     speaking() {
@@ -50,7 +51,7 @@
         <button class="btn btn-primary" data-label="Feedback নিই">Feedback নিই</button></form><div id="sout" style="margin-top:20px;max-width:980px"></div>`;
       const f = panel.querySelector("#sf");
       f.onsubmit = async e => { e.preventDefault(); const btn = f.querySelector("button"), out = panel.querySelector("#sout"); busy(btn, true);
-        try { const { result } = await A.post("/ai/speaking", Object.fromEntries(new FormData(f))); out.innerHTML = R.speaking(result); } catch (x) { fail(out, x); }
+        try { const { result, id } = await A.post("/ai/speaking", Object.fromEntries(new FormData(f))); out.innerHTML = R.speaking(result) + saved(id); } catch (x) { fail(out, x); }
         busy(btn, false); };
     }
   };

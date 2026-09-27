@@ -4,7 +4,7 @@ const path = require("path");
 const crypto = require("crypto");
 
 const FILE = process.env.PORCHI_DB || path.join(__dirname, "storage", "db.json");
-const EMPTY = { users: [], sessions: [], posts: [], videos: [], questions: [], passages: [], mocks: [], partnerPrefs: [], rooms: [], roomMembers: [], reports: [], blocks: [], partnerRequests: [], partnerSessions: [], partnerFeedback: [], aiFeedback: [], attempts: [], mistakes: [], audit: [] };
+const EMPTY = { users: [], sessions: [], posts: [], videos: [], questions: [], passages: [], mocks: [], partnerPrefs: [], rooms: [], roomMembers: [], reports: [], blocks: [], partnerRequests: [], partnerSessions: [], partnerFeedback: [], aiFeedback: [], notifications: [], attempts: [], mistakes: [], audit: [] };
 
 let data;
 function load() {

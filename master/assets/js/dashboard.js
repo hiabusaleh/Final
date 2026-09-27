@@ -19,7 +19,8 @@
       <div class="btn-row" style="margin-top:24px"><a class="btn btn-primary" href="${root}study-plan/index.html">Continue Study Plan</a></div>`) + `
       <div id="live-stats"></div>
       <h2 style="margin-top:40px">Coming next</h2><div class="grid">
-        ${["Today's Tasks", "Weak Areas", "Recent Tests", "Saved Items", "Mistake Book"].map(x =>
+        ${[["My feedback", "feedback/index.html"]].map(([x, h]) => `<a class="card" style="text-decoration:none;color:inherit" href="${root}${h}"><h3>${x} →</h3></a>`).join("")}
+        ${["Today's Tasks", "Weak Areas", "Recent Tests", "Saved Items"].map(x =>
           `<div class="card"><h3>${x}</h3><span class="tag soon">Account system-এর পর</span></div>`).join("")}</div>`;
   }
 
