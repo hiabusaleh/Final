@@ -18,7 +18,7 @@
            <span style="position:absolute;inset:0;display:grid;place-items:center;font-size:3rem">▶️</span></button>`
       : `<div class="notice">YouTube URL যুক্ত হয়নি (data/posts.js)।</div>`;
     return `<div class="card" id="${v.id}">${media}<div style="margin-top:12px"><span class="tag">${esc(v.skill)}</span><span class="tag">${esc(v.topic)}</span></div>
-      <h3>${esc(v.title)}</h3><p>${esc(v.description)}</p>
+      <h3>${esc(v.title)} <a href="#" style="font-size:.9rem" data-save='${esc(JSON.stringify({ kind: "video", refId: v.id, title: v.title, link: "videos/index.html#" + v.id }))}'>☆ Save</a></h3><p>${esc(v.description)}</p>
       <div class="btn-row">${v.relatedPractice ? `<a class="btn btn-outline" href="${link(v.relatedPractice)}">Practice →</a>` : ""}
       ${v.relatedCourse ? `<a class="btn btn-outline" href="${link(v.relatedCourse)}">Course →</a>` : ""}</div></div>`;
   }).join("") || `<p class="muted">এই skill-এর ভিডিও শীঘ্রই আসছে।</p>`;

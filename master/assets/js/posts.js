@@ -11,7 +11,8 @@
       <a class="tag" target="_blank" rel="noopener" href="https://wa.me/?text=${t}%20${url}">WhatsApp</a>
       <a class="tag" target="_blank" rel="noopener" href="https://t.me/share/url?url=${url}&text=${t}">Telegram</a>
       <a class="tag" target="_blank" rel="noopener" href="https://x.com/intent/post?url=${url}&text=${t}">X</a>
-      <a class="tag" href="#" data-copy="${p.id}">Copy link</a></div>`;
+      <a class="tag" href="#" data-copy="${p.id}">Copy link</a>
+      <a class="tag" href="#" data-save='${esc(JSON.stringify({ kind: "post", refId: p.id, title: p.title, link: "posts/index.html#" + p.id }))}'>☆ Save</a></div>`;
   };
   const render = () => {
     const list = posts.filter(p => active === "All" || p.category === active)

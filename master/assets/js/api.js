@@ -48,3 +48,11 @@ window.PorchiAPI.contentReady = (async () => {
     if (videos.length) P.videos = videos;
   } catch { /* keep static data */ }
 })();
+
+/* ☆ Save buttons: <a data-save='{"kind","refId","title","link"}'> anywhere on the page */
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-save]"); if (!b) return; e.preventDefault();
+  const A = window.PorchiAPI, root = window.Porchi.root;
+  if (!A.online || !(await A.me())) { location.href = `${root}account/index.html?next=${encodeURIComponent(location.pathname)}`; return; }
+  try { await A.post("/me/saved", JSON.parse(b.dataset.save)); b.textContent = "★ Saved"; } catch (x) { alert(x.message); }
+});

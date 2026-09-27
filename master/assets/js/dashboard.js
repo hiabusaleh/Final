@@ -18,10 +18,7 @@
         `<div class="card"><h3>${cap(s)} · ${b.toFixed(1)}</h3><div class="progress"><div style="width:${b / 9 * 100}%"></div></div></div>`).join("")}</div>
       <div class="btn-row" style="margin-top:24px"><a class="btn btn-primary" href="${root}study-plan/index.html">Continue Study Plan</a></div>`) + `
       <div id="live-stats"></div>
-      <h2 style="margin-top:40px">Coming next</h2><div class="grid">
-        ${[["My feedback", "feedback/index.html"]].map(([x, h]) => `<a class="card" style="text-decoration:none;color:inherit" href="${root}${h}"><h3>${x} →</h3></a>`).join("")}
-        ${["Today's Tasks", "Weak Areas", "Recent Tests", "Saved Items"].map(x =>
-          `<div class="card"><h3>${x}</h3><span class="tag soon">Account system-এর পর</span></div>`).join("")}</div>`;
+      <div id="dash-live"></div>`;
   }
 
   if ($("dash") && user) {
@@ -31,6 +28,19 @@
         <div style="display:flex;gap:3px;margin-top:8px" role="img" aria-label="Study days in the last 30 days">${k.last30.map(d => `<span title="${d.date}${d.active ? " ✓" : ""}" style="flex:1;height:14px;border-radius:3px;background:${d.active ? "var(--green)" : "var(--mist)"}"></span>`).join("")}</div>
         <small class="muted">গত ৩০ দিন · সবচেয়ে লম্বা streak ${k.longest} দিন ${k.today ? "" : `· <a href="${root}practice/micro/index.html">আজকের ছোট practice →</a>`}</small>`;
       $("dash").querySelector("h1").after(box);
+    }).catch(() => {});
+    Promise.all([window.PorchiAPI.get("/me/plan"), window.PorchiAPI.get("/me/attempts"), window.PorchiAPI.get("/me/saved")]).then(([p, at, sv]) => {
+      const esc = window.Porchi.esc;
+      $("dash-live").innerHTML = `<div class="grid grid-2" style="margin-top:32px;align-items:start">
+        <div class="card"><h3>📅 Today's tasks</h3>${p.today.map(t => `<p style="margin:4px 0">${t.done ? "✅" : "⬜"} <a href="${root}${esc(t.link)}">${esc(t.title)}</a> <small class="muted">${t.minutes}m</small></p>`).join("")}
+          <a class="more" href="${root}study-plan/index.html">Study plan →</a></div>
+        <div class="card"><h3>🔍 Weak areas</h3><p>${p.weakness.weakSkills.map(s => `<span class="tag">${esc(s)}</span>`).join("")}${p.weakness.weakTypes.slice(0, 4).map(t => `<span class="tag soon">${esc(t.type)} ${t.accuracy}%</span>`).join("")}</p>
+          <a class="more" href="${root}practice/index.html#mistakes">Mistake Book (${p.weakness.openMistakes}) →</a></div>
+        <div class="card"><h3>🧪 Recent tests</h3>${at.attempts.slice(0, 4).map(a => `<p style="margin:4px 0"><a href="${root}mock-tests/results/index.html?id=${a.id}">${esc(a.mockTitle || "Mock")}</a>
+          <small class="muted">${esc(a.submittedAt.slice(0, 10))} · ${a.sections.map(s => `${s.skill[0].toUpperCase()}${s.band ?? "–"}`).join(" ")}</small></p>`).join("") || `<p class="muted">এখনো mock দেওয়া হয়নি।</p>`}
+          <a class="more" href="${root}mock-tests/index.html">Mock tests →</a></div>
+        <div class="card"><h3>⭐ Saved items</h3>${sv.items.slice(0, 6).map(i => `<p style="margin:4px 0"><a href="${root}${esc(i.link)}">${esc(i.title)}</a> <small class="tag">${esc(i.kind)}</small></p>`).join("") || `<p class="muted">Post, video বা lesson-এ ☆ চাপলে এখানে জমা হবে।</p>`}</div>
+        <a class="card" href="${root}feedback/index.html" style="text-decoration:none;color:inherit"><h3>📝 My feedback →</h3><p>AI ও শিক্ষকের মূল্যায়ন</p></a></div>`;
     }).catch(() => {});
     window.PorchiAPI.get("/me/stats").then(st => {
       const rows = Object.entries(st.byType).sort((a, b) => a[1].correct / a[1].attempted - b[1].correct / b[1].attempted);

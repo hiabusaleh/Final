@@ -85,10 +85,17 @@ route("PUT", "/api/me/profile", async (req, res, { user, body }) => {
   requireRole(user);
   const p = body.profile || {};
   const profile = {
-    testType: str(p.testType, "testType", { optional: true, max: 60 }),
-    targetBand: Math.min(9, Math.max(0, +p.targetBand || 0)) || undefined,
-    testDate: str(p.testDate, "testDate", { optional: true, max: 20 }),
-    diagnostic: p.diagnostic && typeof p.diagnostic === "object" ? p.diagnostic : user.profile?.diagnostic
+    testType: str(p.testType, "testType", { optional: true, max: 60 }) || user.profile?.testType,
+    targetBand: Math.min(9, Math.max(0, +p.targetBand || 0)) || user.profile?.targetBand,
+    testDate: p.testDate === undefined ? user.profile?.testDate : str(p.testDate, "testDate", { optional: true, max: 20 }),
+    diagnostic: p.diagnostic && typeof p.diagnostic === "object" ? p.diagnostic : user.profile?.diagnostic,
+    hoursPerDay: Math.min(8, Math.max(0.25, +p.hoursPerDay || user.profile?.hoursPerDay || 1)),
+    osr: p.osr === null ? undefined : p.osr && typeof p.osr === "object" ? {
+      bands: Object.fromEntries(["listening", "reading", "writing", "speaking"].map(k => [k, Math.min(9, Math.max(0, Math.round((+p.osr.bands?.[k] || 0) * 2) / 2))])),
+      focusSkill: ["listening", "reading", "writing", "speaking"].includes(p.osr.focusSkill) ? p.osr.focusSkill : undefined,
+      fullTestDate: str(p.osr.fullTestDate, "fullTestDate", { optional: true, max: 20 }),
+      checklist: Array.isArray(p.osr.checklist) ? p.osr.checklist.map(Boolean).slice(0, 10) : [] } : user.profile?.osr,
+    notifSeenAt: user.profile?.notifSeenAt
   };
   send(res, 200, { user: auth.publicUser(db.update("users", user.id, { profile })) });
 });
@@ -97,7 +104,7 @@ route("DELETE", "/api/me", async (req, res, { user }) => {
   requireRole(user);
   if (user.role === "super_admin" && db.filter("users", u => u.role === "super_admin").length === 1) fail(400, "Last super admin cannot be deleted");
   require("./routes/recordings").purgeUser?.(user.id, db);
-  for (const t of ["attempts", "mistakes", "sessions", "partnerPrefs", "blocks", "aiFeedback", "notifications", "vocabProgress", "vocabCustom", "activity"]) db.removeWhere(t, x => x.userId === user.id);
+  for (const t of ["attempts", "mistakes", "sessions", "partnerPrefs", "blocks", "aiFeedback", "notifications", "vocabProgress", "vocabCustom", "activity", "planDone", "saved"]) db.removeWhere(t, x => x.userId === user.id);
   db.removeWhere("partnerRequests", r => r.fromId === user.id || r.toId === user.id);
   db.remove("users", user.id);
   send(res, 200, { ok: true }, { "Set-Cookie": auth.cookie("", SECURE) });
@@ -121,7 +128,7 @@ route("GET", "/api/admin/audit", async (req, res, { user }) => {
 });
 
 /* Feature modules register more routes */
-for (const m of ["content", "questions", "mocks", "collaborate", "partner", "ai", "review", "recordings", "notifications", "analytics", "vocab"]) {
+for (const m of ["content", "questions", "mocks", "collaborate", "partner", "ai", "review", "recordings", "notifications", "analytics", "vocab", "plan"]) {
   const f = path.join(__dirname, "routes", m + ".js");
   if (fs.existsSync(f)) require(f)({ route, fail, send, str, requireRole, audit, db, auth });
 }

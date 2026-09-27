@@ -88,6 +88,22 @@ async function analyzeSpeaking({ prompt, transcript, part = "Part 2" }) {
   return { ...r, label: LABEL + " — pronunciation not assessed from text" };
 }
 
+/* Personal advice on top of the rule-based study plan */
+async function createStudyPlan({ plan, profile }) {
+  const r = await need().complete({
+    system: TEACHER, effort: "medium",
+    schema: obj({ summary: str, priorities: strs, daily_routine: strs, warning_signs: strs, bangla_tip: str }),
+    messages: [{ role: "user", content:
+`Give personal study advice for this IELTS learner. Keep the existing plan; explain priorities and a realistic daily routine.
+Target band: ${plan.weakness.target}. Days to test: ${plan.days}. Hours per day: ${plan.hours}.
+Current bands (indicative): ${JSON.stringify(plan.weakness.bands)}.
+Weak skills: ${plan.weakness.weakSkills.join(", ")}. Weak question types: ${plan.weakness.weakTypes.map(t => `${t.type} ${t.accuracy}%`).join(", ") || "not enough data"}.
+Open mistakes: ${plan.weakness.openMistakes}. Mocks taken: ${plan.weakness.mockCount}.${profile.osr?.focusSkill ? `
+The learner is preparing for an IELTS One Skill Retake in ${profile.osr.focusSkill}.` : ""}` }]
+  });
+  return { ...r, label: "Porchi AI suggestion" };
+}
+
 /* Free chat with the AI Teacher */
 async function chat({ messages, learner }) {
   const text = await need().complete({
@@ -97,4 +113,4 @@ async function chat({ messages, learner }) {
   return { reply: text, label: "Porchi AI Teacher" };
 }
 
-module.exports = { explainQuestion, gradeWriting, analyzeSpeaking, chat, setProvider, status: () => { const p = getProvider(); return { enabled: !!p, provider: p?.name || null }; }, LABEL };
+module.exports = { explainQuestion, gradeWriting, analyzeSpeaking, createStudyPlan, chat, setProvider, status: () => { const p = getProvider(); return { enabled: !!p, provider: p?.name || null }; }, LABEL };

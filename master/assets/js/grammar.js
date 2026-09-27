@@ -6,7 +6,7 @@
   function show(id) {
     const g = G.find(x => x.id === id); if (!g) return;
     const box = el.querySelector("#lesson");
-    box.innerHTML = `<div class="card"><h2>${esc(g.topic)}</h2><p style="color:var(--ink)">${esc(g.lesson)}</p>
+    box.innerHTML = `<div class="card"><h2>${esc(g.topic)} <a href="#" style="font-size:.9rem" data-save='${esc(JSON.stringify({ kind: "lesson", refId: g.id, title: "Grammar: " + g.topic, link: "grammar/index.html#" + g.id }))}'>☆ Save</a></h2><p style="color:var(--ink)">${esc(g.lesson)}</p>
       <h3>উদাহরণ</h3><ul>${g.examples.map(x => `<li style="font-family:var(--font-read)">${esc(x)}</li>`).join("")}</ul>
       <h3>সাধারণ ভুল</h3><ul>${g.errors.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
       <form class="card" id="gq" style="margin-top:16px"><h3>Quick test (${g.q.length})</h3>${g.q.map(([s, opts], i) => `<div style="margin:12px 0" data-i="${i}">
