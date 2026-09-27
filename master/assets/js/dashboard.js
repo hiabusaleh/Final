@@ -1,12 +1,14 @@
 /* Dashboard, study plan and progress — local-only until accounts/backend exist (Blueprint §15, §28, §29) */
-(function () {
-  const { store, root } = window.Porchi, d = store.get("diagnostic", null);
+(async function () {
+  const { store, root } = window.Porchi;
+  const user = await window.PorchiAPI.me();
+  const d = user?.profile?.diagnostic || store.get("diagnostic", null);
   const cap = s => s[0].toUpperCase() + s.slice(1);
   const noDiag = `<div class="notice">এখনো diagnostic দেওয়া হয়নি। <a href="${root}diagnostic/index.html">কয়েক মিনিটে level যাচাই করি →</a></div>`;
   const $ = id => document.getElementById(id);
 
   if ($("dash")) {
-    $("dash").innerHTML = `<div class="eyebrow">Student Dashboard</div><h1>Welcome back 👋</h1>` + (!d ? noDiag : `
+    $("dash").innerHTML = `<div class="eyebrow">Student Dashboard</div><h1>Welcome back${user ? ", " + window.Porchi.esc(user.name.split(" ")[0]) : ""} 👋</h1>` + (!d ? noDiag : `
       <div class="grid">
         <div class="card"><h3>Target band</h3><div class="score">${d.target.toFixed(1)}</div></div>
         <div class="card"><h3>Current estimate</h3><div class="score">${d.overall.toFixed(1)}</div><small class="muted">Indicative</small></div>

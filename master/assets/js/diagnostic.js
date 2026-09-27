@@ -34,6 +34,7 @@
       weaknesses: sorted.slice(-2).map(x => x[0]), at: new Date().toISOString(), version: "DIAGNOSTIC_V1"
     };
     store.set("diagnostic", result);
+    window.PorchiAPI?.me().then(u => u && window.PorchiAPI.put("/me/profile", { profile: { diagnostic: result, targetBand: result.target, testDate: result.date, testType: result.test } }).catch(() => {}));
     const cap = s => s[0].toUpperCase() + s.slice(1);
     document.getElementById("result").innerHTML = `<div class="card">
       <h2>এখান থেকে শুরু করলে সবচেয়ে বেশি লাভ হবে।</h2>
