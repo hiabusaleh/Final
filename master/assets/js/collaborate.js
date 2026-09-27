@@ -10,7 +10,7 @@
     const [{ prefs, options }, { rooms, options: ro }] = await Promise.all([A.get("/collab/partner-prefs"), A.get("/collab/rooms")]);
     const p = prefs || { testType: "academic", targetBand: 6.5, speakingLevel: 5.5, parts: [], days: [], times: [], minutes: 30 };
     el.innerHTML = `<div class="grid grid-2" style="margin-top:32px;align-items:start">
-      <form class="card" id="pf"><h3>🗣️ Speaking Partner</h3>
+      <div><form class="card" id="pf"><h3>🗣️ Speaking Partner</h3>
         <label><input type="checkbox" name="enabled" style="width:auto" ${p.enabled ? "checked" : ""}> Speaking Partner চালু</label>
         <label>Test type</label><select name="testType"><option value="academic">Academic</option><option value="general" ${p.testType === "general" ? "selected" : ""}>General Training</option></select>
         <label>Target band</label><input name="targetBand" type="number" step="0.5" min="4" max="9" value="${p.targetBand}">
@@ -22,8 +22,8 @@
         <label><input type="checkbox" name="communityGuidelinesAccepted" style="width:auto" ${p.communityGuidelinesAccepted ? "checked" : ""}>
           Community guidelines মানব — সম্মানজনক আচরণ, ব্যক্তিগত তথ্য চাওয়া নয়, শুধু IELTS practice</label>
         <p class="notice warn" id="perr" hidden></p>
-        <button class="btn btn-primary" style="margin-top:12px">Save</button>
-        <div id="matches"></div></form>
+        <button class="btn btn-primary" style="margin-top:12px">Save</button></form>
+        <div id="matches"></div></div>
       <div><div class="card"><h3>📚 Study Rooms</h3>
         <form id="rf"><label>Room name</label><input name="name" required maxlength="80">
           <label>Template</label><select name="template">${ro.TEMPLATES.map(t => `<option>${t}</option>`).join("")}</select>
@@ -49,6 +49,24 @@
     el.querySelector("#rf").onsubmit = async e => { e.preventDefault(); try { await A.post("/collab/rooms", Object.fromEntries(new FormData(e.target))); render(); } catch (x) { err("#rerr", x); } };
     el.querySelector("#jf").onsubmit = async e => { e.preventDefault(); try { await A.post("/collab/rooms/join", Object.fromEntries(new FormData(e.target))); render(); } catch (x) { err("#rerr", x); } };
     if (p.enabled) showMatches();
+    showSessions();
+  }
+  async function showSessions() {
+    let box = el.querySelector("#psessions");
+    if (!box) { box = document.createElement("div"); box.id = "psessions"; el.prepend(box); }
+    const [{ incoming, outgoing }, { sessions }] = await Promise.all([A.get("/collab/partner/requests"), A.get("/collab/partner/sessions")]);
+    const when = d => new Date(d).toLocaleString();
+    const upcoming = sessions.filter(s => s.status !== "ended"), past = sessions.filter(s => s.status === "ended");
+    box.innerHTML = !(incoming.length || outgoing.length || sessions.length) ? "" : `<h2 style="margin-top:32px">তোমার Speaking sessions</h2>
+      ${incoming.map(r => `<div class="notice">📩 <strong>${esc(r.from.name)}</strong> তোমাকে practice-এ ডেকেছে — ${when(r.scheduledAt)} · ${r.minutes} মিনিট
+        ${r.note ? `<br><small>${esc(r.note)}</small>` : ""}<br><a href="#" data-req="${r.id}" data-act="accept">Accept</a> · <a href="#" data-req="${r.id}" data-act="decline">Decline</a></div>`).join("")}
+      ${outgoing.map(r => `<div class="notice">⏳ ${esc(r.to.name)}-এর উত্তরের অপেক্ষা — ${when(r.scheduledAt)} · <a href="#" data-req="${r.id}" data-act="cancel">Cancel</a></div>`).join("")}
+      ${upcoming.length ? `<div class="grid" style="margin-top:12px">${upcoming.map(s => `<div class="card"><h3>${esc(s.partner.name)}</h3>
+        <p>${when(s.scheduledAt)} · ${s.minutes} মিনিট</p><a class="btn btn-primary" href="${root}collaborate/session/index.html?id=${s.id}">Join →</a></div>`).join("")}</div>` : ""}
+      ${past.length ? `<h3 style="margin-top:20px">History</h3><div style="overflow-x:auto"><table><tr><th>Partner</th><th>Date</th><th>Feedback পেয়েছ</th><th></th></tr>
+        ${past.map(s => `<tr><td>${esc(s.partner.name)}</td><td>${when(s.startedAt || s.scheduledAt)}</td>
+          <td>${s.feedbackReceived ? Object.values(s.feedbackReceived.ratings).join(" / ") + " (F/V/G/P)" : "—"}</td>
+          <td><a href="${root}collaborate/session/index.html?id=${s.id}">${s.myFeedbackGiven ? "দেখি" : "Feedback দিই"}</a></td></tr>`).join("")}</table></div>` : ""}`;
   }
   async function showMatches() {
     const box = el.querySelector("#matches");
@@ -56,12 +74,22 @@
       const { matches } = await A.get("/collab/partner-matches");
       box.innerHTML = `<h3 style="margin-top:20px">Suggested partners</h3>` + (matches.map(m => `<div class="notice">${esc(m.name)} · Speaking ~${m.speakingLevel} · Target ${m.targetBand}<br>
         <small>${m.commonDays.join(", ")} · ${m.commonTimes.join(", ")} · ${m.parts.join(", ")}</small><br>
-        <small><a href="#" data-block="${m.userId}">Block</a> · <a href="#" data-report="${m.userId}">Report</a> · Session booking Phase B-তে আসবে</small></div>`).join("")
+        <form data-invite="${m.userId}" style="margin-top:8px"><input type="datetime-local" name="when" required style="width:auto">
+          <select name="minutes" style="width:auto"><option>15</option><option selected>30</option><option>45</option></select>
+          <button class="btn btn-primary" style="padding:6px 12px">Invite</button></form>
+        <small><a href="#" data-block="${m.userId}">Block</a> · <a href="#" data-report="${m.userId}">Report</a></small></div>`).join("")
         || `<p class="muted">এখনো মিলে যাওয়ার মতো partner নেই — পরে আবার দেখো।</p>`);
     } catch (x) { box.innerHTML = `<p class="muted">${esc(x.message)}</p>`; }
   }
+  el.addEventListener("submit", async e => {
+    const to = e.target.dataset.invite; if (!to) return; e.preventDefault();
+    const fd = new FormData(e.target);
+    try { await A.post("/collab/partner/requests", { toUserId: to, scheduledAt: new Date(fd.get("when")).toISOString(), minutes: fd.get("minutes") });
+      e.target.outerHTML = `<p class="muted">Invite পাঠানো হয়েছে ✓</p>`; showSessions(); } catch (x) { alert(x.message); }
+  });
   el.addEventListener("click", async e => {
     const d = e.target.dataset;
+    if (d.req) { e.preventDefault(); try { await A.put(`/collab/partner/requests/${d.req}`, { action: d.act }); showSessions(); } catch (x) { alert(x.message); } }
     if (d.leave) { e.preventDefault(); if (confirm("নিশ্চিত?")) { await A.post(`/collab/rooms/${d.leave}/leave`); render(); } }
     if (d.block) { e.preventDefault(); if (confirm("Block করবে? এরপর একে আর match বা room-এ দেখবে না।")) { await A.post("/collab/blocks", { userId: d.block }); showMatches(); } }
     if (d.report) { e.preventDefault(); const description = prompt("কী হয়েছে সংক্ষেপে লেখো (অন্তত ৫ অক্ষর):"); if (!description) return;

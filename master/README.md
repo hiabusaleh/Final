@@ -47,10 +47,16 @@ listening: { url: "https://your-listening-site.com", newTab: false },
   versioned scoring (`server/scoring/rulesets.js`), question-type report, recommendations; Writing = review pending
 
 ## Collaborate (Speaking Partner, Study Rooms)
-**Phase A সম্পন্ন:** partner preferences + matching, Study Room (invite code, owner/host/participant/observer permission),
-block, report ও Admin → Reports moderation queue। Frontend: `collaborate/` · Backend: `server/routes/collaborate.js`।
-Phase B/C-র জন্য real-time layer (WebSocket) ও
-audio/video media layer লাগবে — `Porchi/PORCHI_EXCLUSIVE_FEATURES_FINAL_PLAN.md` §42, §53 দেখুন।
+**Phase A ও B সম্পন্ন:**
+- Partner preferences + matching, block, report, Admin → Reports moderation queue
+- Study Room: invite code, owner/host/participant/observer permission
+- Speaking Partner: invite → accept → 1:1 audio/video call (browser WebRTC, peer-to-peer; recording OFF),
+  structured IELTS mode (Part 1/2/3, examiner ↔ candidate role swap, নিজস্ব prompts `data/speaking-prompts.js`, shared timer),
+  peer feedback ও session history
+- কঠোর network (কিছু mobile/office)-এ call সংযোগের জন্য TURN server লাগতে পারে:
+  `PORCHI_ICE='[{"urls":"turn:your-turn:3478","username":"u","credential":"p"}]' npm start`
+
+Phase C (Study Room-এ live shared page, whiteboard, chat, group call) বাকি — এর জন্য group call-এ media server (SFU) লাগবে।
 
 ## যা কাজ করে
 - Diagnostic → indicative band, strengths/weaknesses (ব্রাউজারে সংরক্ষিত)
@@ -60,6 +66,6 @@ audio/video media layer লাগবে — `Porchi/PORCHI_EXCLUSIVE_FEATURES_FI
 - Practice filter, Search, mobile menu
 
 ## পরের ধাপ
-Collaborate Phase B (Speaking Partner session) → AI Teacher (provider-agnostic `AIService`) → Writing/Speaking feedback →
+AI Teacher (provider-agnostic `AIService`) → Writing/Speaking feedback →
 PostgreSQL-এ স্থানান্তর (`server/db.js`-এর function নাম একই রেখে)।
 সব score **indicative**; Porchi কোনো official IELTS partner নয়।
