@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Check Your Level — Porchi IELTS</title>
+  <meta property="og:title" content="Check Your Level — Porchi IELTS">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+Bengali:wght@400;600&family=Plus+Jakarta+Sans:wght@700;800&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+</head>
+<body data-root="../" data-page="diagnostic">
+<main>
+  <section class="page-hero"><div class="container" style="max-width:780px">
+    <div class="eyebrow">Check Your Level</div>
+    <h1>কয়েক মিনিটে তোমার বর্তমান অবস্থাটা বুঝি।</h1>
+    <div class="notice">এটি একটি self-assessment। ফলাফল <strong>indicative</strong> — official IELTS score নয়।</div>
+    <form id="diag" class="card">
+      <label for="test">Test type</label><select id="test" name="test"></select>
+      <label for="target">Target band</label>
+      <select id="target" name="target">
+        <option>5.5</option><option>6.0</option><option selected>6.5</option><option>7.0</option>
+        <option>7.5</option><option>8.0</option><option>8.5</option><option>9.0</option></select>
+      <label for="date">Test date (জানা থাকলে)</label><input type="date" id="date" name="date">
+      <label for="hours">দৈনিক পড়ার সময়</label>
+      <select id="hours" name="hours"><option value="0.5">৩০ মিনিট</option><option value="1" selected>১ ঘণ্টা</option>
+        <option value="2">২ ঘণ্টা</option><option value="3">৩+ ঘণ্টা</option></select>
+      <div id="skill-qs"></div>
+      <button class="btn btn-primary" style="margin-top:20px" type="submit">ফলাফল দেখি</button>
+    </form>
+    <div id="result" style="margin-top:24px"></div>
+  </div></section>
+</main>
+<script src="../assets/js/config.js"></script>
+<script src="../data/content.js"></script>
+<script src="../data/test-profiles.js"></script>
+<script src="../data/posts.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/diagnostic.js"></script>
+</body>
+</html>

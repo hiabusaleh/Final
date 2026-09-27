@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Practice — Porchi IELTS</title>
+  <meta property="og:title" content="Practice — Porchi IELTS">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+Bengali:wght@400;600&family=Plus+Jakarta+Sans:wght@700;800&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+</head>
+<body data-root="../" data-page="practice">
+<main>
+  <section class="page-hero"><div class="container">
+    <div class="eyebrow">Practice</div><h1>Practice / Question Bank</h1>
+    <p class="muted">Skill, question type, difficulty ও target band ধরে practice। প্রশ্নগুলো Admin থেকে যুক্ত হবে।</p>
+    <div class="card" style="margin:20px 0"><div class="grid">
+      <div><label for="f-skill">Skill</label><select id="f-skill"></select></div>
+      <div><label for="f-type">Question type</label><select id="f-type"></select></div>
+      <div><label for="f-diff">Difficulty</label><select id="f-diff"></select></div>
+      <div><label for="f-band">Target band</label><select id="f-band"></select></div>
+    </div></div>
+    <div id="practice-out"></div>
+    <h2 style="margin-top:40px">Micro Practice (৫–১০ মিনিট)</h2>
+    <div class="grid">
+      <div class="card"><h3>৫ মিনিটের vocabulary quiz</h3><span class="tag soon">শীঘ্রই</span></div>
+      <div class="card"><h3>১০ মিনিটের Listening drill</h3><span class="tag soon">শীঘ্রই</span></div>
+      <div class="card"><h3>৫-প্রশ্নের Reading challenge</h3><span class="tag soon">শীঘ্রই</span></div>
+      <div class="card"><h3>Task 2 introduction drill</h3><span class="tag soon">শীঘ্রই</span></div>
+    </div>
+    <h2 style="margin-top:40px" id="mistakes">Mistake Book</h2>
+    <p class="muted">ভুল → কারণ → ব্যাখ্যা → lesson → review queue। Categories:</p>
+    <div id="mistake-types"></div>
+  </div></section>
+</main>
+<script src="../assets/js/config.js"></script>
+<script src="../data/content.js"></script>
+<script src="../data/test-profiles.js"></script>
+<script src="../data/posts.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/practice.js"></script>
+</body>
+</html>
