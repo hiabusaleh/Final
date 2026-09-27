@@ -10,10 +10,14 @@
     ...P.videos.map(v => ({ kind: "Video", title: v.title, text: v.description + " " + v.topic, href: `videos/index.html#${v.id}` }))
   ];
   const input = document.getElementById("q"), out = document.getElementById("results");
-  const run = () => {
+  let timer;
+  const run = () => { clearTimeout(timer); timer = setTimeout(go, 200); };
+  const go = async () => {
     const q = input.value.trim().toLowerCase();
     if (!q) { out.innerHTML = ""; return; }
-    const hits = idx.filter(i => (i.title + " " + i.text).toLowerCase().includes(q));
+    let hits = idx.filter(i => (i.title + " " + i.text).toLowerCase().includes(q));
+    if (window.PorchiAPI.online) try { const r = (await window.PorchiAPI.get("/search?q=" + encodeURIComponent(q))).results;
+      const seen = new Set(hits.map(h => h.href)); hits = [...hits, ...r.filter(h => !seen.has(h.href))]; } catch {}
     out.innerHTML = hits.map(h => `<a class="card" style="margin-bottom:10px;text-decoration:none;color:inherit" href="${root}${h.href}">
       <span class="tag">${h.kind}</span><strong>${esc(h.title)}</strong></a>`).join("") || `<p class="muted">কিছু পাওয়া যায়নি।</p>`;
   };

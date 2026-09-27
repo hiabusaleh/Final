@@ -57,6 +57,7 @@
           <li><a href="${root}resources/index.html">Resources</a></li>
           <li><a href="${root}test-info/index.html">Test Information</a></li>
           <li><a href="${root}search/index.html">Search</a></li>
+          <li><a href="${root}legal/index.html">Privacy &amp; Terms</a></li>
           <li><a href="${root}admin/index.html">Admin</a></li>
         </ul></div>
       </div>
