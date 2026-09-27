@@ -89,3 +89,14 @@ th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--li
 .video-frame { aspect-ratio: 16 / 9; width: 100%; border: 0; border-radius: var(--radius); }
 .card > .tag, .card > small.tag, .card > div > .tag { align-self: flex-start; }
 .card small.tag { display: inline-block; }
+/* Speaking partner session */
+.call { display: grid; grid-template-columns: 1.1fr .9fr; gap: var(--gap); align-items: start; }
+.videos { position: relative; background: var(--ink); border-radius: var(--radius); aspect-ratio: 4 / 3; overflow: hidden; display: grid; place-items: center; color: #DCE7E1; }
+.videos video.remote { width: 100%; height: 100%; object-fit: cover; }
+.videos video.local { position: absolute; right: 12px; bottom: 12px; width: 28%; border-radius: var(--radius-sm); border: 2px solid #fff; background: #000; }
+.videos .status { position: absolute; left: 12px; top: 12px; background: #0009; padding: 4px 10px; border-radius: 999px; font-size: .85rem; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.controls .btn { padding: 8px 14px; }
+.btn-danger { background: var(--coral); color: #fff; }
+.cue { background: #FFFBEF; border: 1px dashed #D9B84A; border-radius: var(--radius-sm); padding: 14px; }
+@media (max-width: 860px) { .call { grid-template-columns: 1fr; } }
